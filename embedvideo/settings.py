@@ -1,5 +1,10 @@
 import os
 from pathlib import Path
+from django.core.management.utils import get_random_secret_key
+
+import sys
+import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -10,13 +15,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-_k%mwpb+twzfr+xu3s=)&)a0-84g=$ea#5-7zrm8me83#4b0pt'
-SECRET_KEY=os.getenv('SECRET_KEY','django-insecure-_k%mwpb+twzfr+xu3s=)&)a0-84g=$ea#5-7zrm8me83#4b0pt')
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG','True') == 'True'
+DEBUG = os.getenv('DEBUG','False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS','127.0.0.1,localhost' ).split(',')
+DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
 
 # Application definition
@@ -65,28 +71,18 @@ WSGI_APPLICATION = 'embedvideo.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-DATABASES_URL=os.getenv('DATABASES_URL',None)
-
-if not DATABASES_URL:
-    
+if DEVELOPMENT_MODE is True:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
         }
     }
-
-else:
+elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
+    if os.getenv("DATABASE_URL", None) is None:
+        raise Exception("DATABASE_URL environment variable not defined")
     DATABASES = {
-        'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
-        'OPTIONS':{'sslmode':'require'},
-        }
+        "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
     }
 
 
