@@ -1,9 +1,5 @@
 import os
 from pathlib import Path
-from django.core.management.utils import get_random_secret_key
-
-import dj_database_url
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,14 +10,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-_k%mwpb+twzfr+xu3s=)&)a0-84g=$ea#5-7zrm8me83#4b0pt'
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
+SECRET_KEY=os.getenv('SECRET_KEY','django-insecure-_k%mwpb+twzfr+xu3s=)&)a0-84g=$ea#5-7zrm8me83#4b0pt')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG','False') == 'True'
+DEBUG = os.getenv('DEBUG','True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS','127.0.0.1,localhost' ).split(',')
-DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
+ALLOWED_HOSTS =os.getenv('ALLOWED_HOSTS','127.0.0.1,localhost' ).split(',')
 
 
 # Application definition
@@ -83,7 +78,7 @@ if not DATABASES_URL:
 
 else:
     DATABASES = {
-         'default': {
+        'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
